@@ -212,6 +212,50 @@ class PublicBuildTests(unittest.TestCase):
                 self.assertNotIn("Rate confirmed before engagement", homepage)
                 self.assertNotIn("Rate confirmed in writing", terms)
 
+    def test_no_javascript_audit_fails_closed_with_a_manual_contact_path(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            page = (output / "index.html").read_text(encoding="utf-8")
+            script = (output / "site.js").read_text(encoding="utf-8")
+            self.assertIn('<button class="button button-signal" disabled type="submit">Open My Free Audit Request</button>', page)
+            self.assertIn('<noscript><p class="audit-nojs">JavaScript is off', page)
+            self.assertIn("Nothing has been submitted.", page)
+            self.assertIn("href=\"about.html#location\">see RETALLY's business contact details</a>", page)
+            self.assertEqual(page.count('data-contact-link href="mailto:'), 2)
+            self.assertIn("do not send invoices, rate agreements, credentials or payment data", page)
+            self.assertIn("form-action 'none'", page)
+            self.assertIn("if (submitButton) submitButton.disabled = false;", script)
+
+    def test_script_load_failure_keeps_verified_contact_fallback_visible(self):
+        """JavaScript can be enabled while site.js fails to load; contact must still work."""
+        with tempfile.TemporaryDirectory() as temporary:
+            output = build(Path(temporary) / "public")
+            html = (output / "index.html").read_text(encoding="utf-8")
+            site_script = re.compile(r'<script src="site\.js\?[^"]+" defer></script>')
+            self.assertEqual(len(site_script.findall(html)), 1)
+            # Simulate script fetch/load failure in a JS-enabled browser:
+            # the page does not execute site.js and the <noscript> block is not shown.
+            script_failed = site_script.sub("", html, count=1)
+            visible_html = re.sub(r"<noscript>.*?</noscript>", "", script_failed, flags=re.S)
+            form = visible_html.split('<form id="auditForm" novalidate>', 1)[1].split("</form>", 1)[0]
+            self.assertIn('disabled type="submit"', form)
+            contact = re.search(
+                r'<p id="auditStaticFallback"(?P<attrs>[^>]*)>(?P<body>.*?)</p>',
+                form, flags=re.S,
+            )
+            self.assertIsNotNone(contact, "Form must have an always-visible static contact path")
+            self.assertNotRegex(contact.group("attrs"), r"\b(?:hidden|aria-hidden|inert)\b")
+            self.assertIn(
+                '<a data-contact-link href="mailto:sales@freightfixture.com?subject=RETALLY%20question">Email our team directly</a>',
+                contact.group("body"),
+            )
+            self.assertIn("press Send", contact.group("body"))
+            self.assertIn("Nothing has been submitted automatically.", contact.group("body"))
+            self.assertIn("Do not attach freight records, contracts, or credentials.", contact.group("body"))
+            # Negative control: without this fallback, the blocked form has no usable
+            # direct contact link within the form itself.
+            self.assertNotIn("mailto:", form.replace(contact.group(0), ""))
+
     def test_private_repository_cannot_be_the_output(self):
         for output in (
             builder.REPOSITORY,
@@ -283,8 +327,8 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn('class="qualification-details"', page)
             self.assertIn("Open My Free Audit Request", page)
             self.assertIn("approved secure intake route", page)
-            self.assertIn("Fixed-Fee Forensic Audit", page)
-            self.assertIn("Available", page)
+            self.assertNotIn("Fixed-Fee Forensic Audit", page)
+            self.assertIn('href="freight-audit-pricing.html"', page)
             self.assertIn("Potential recovery", page)
             self.assertIn("Approved claim value", page)
             self.assertIn("Actual recovered funds", page)
@@ -421,9 +465,9 @@ class PublicBuildTests(unittest.TestCase):
             self.assertNotIn(">sales@freightfixture.com</a>", index)
             self.assertNotIn('type="file"', index.lower())
             self.assertIn("form-action 'none'", index)
-            self.assertIn("connect-src https://www.bubblav.com", index)
+            self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", index)
             self.assertIn("form-action 'none'", index)
-            self.assertNotIn("connect-src 'self'", index)
+            self.assertNotIn("connect-src 'none'", index)
 
     def test_pages_have_unique_ids_and_resolvable_local_links(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -460,7 +504,9 @@ class PublicBuildTests(unittest.TestCase):
             page = (output / "index.html").read_text()
             self.assertIn('site.css?v=free-audit-contingency-v5', page)
             self.assertIn('commercial-config.js?v=free-audit-contingency-v5', page)
-            self.assertIn('site.js?v=qualified-funnel-20261110', page)
+            self.assertIn('site.js?v=qualified-funnel-manual-copy-20261115', page)
+            self.assertIn('id="auditCopyFallback" class="audit-copy-fallback" hidden', page)
+            self.assertIn('id="auditManualSummary"', page)
             self.assertIn('id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000"', page)
             self.assertIn('<dd id="actualRecoveredDisplay">$100,000</dd>', page)
             self.assertNotIn('value="50000"', page)
@@ -687,9 +733,9 @@ class PublicChatbotTests(unittest.TestCase):
                 with self.subTest(page=name):
                     html = (output / name).read_text()
                     self.assertEqual(html.count(expected_script), 1)
-                    self.assertIn("script-src 'self' https://www.bubblav.com;", html)
-                    self.assertIn("connect-src https://www.bubblav.com", html)
-                    self.assertIn("frame-src https://www.bubblav.com", html)
+                    self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;", html)
+                    self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", html)
+                    self.assertIn("frame-src https://challenges.cloudflare.com https://www.bubblav.com", html)
             for name in ("404.html", "recovery-status-example.html"):
                 self.assertNotIn(expected_script, (output / name).read_text())
             self.assertIn("Optional AI chat assistant", (output / "privacy.html").read_text())
@@ -733,9 +779,9 @@ class PublicChatbotTests(unittest.TestCase):
                 content = (output / name).read_text()
                 self.assertIn("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com https://static.cloudflareinsights.com/beacon.min.js;", content)
                 self.assertEqual(content.count("https://static.cloudflareinsights.com/beacon.min.js"), 1)
-                self.assertIn("connect-src 'self' https://www.bubblav.com", content)
-                self.assertIn("frame-src https://www.bubblav.com", content)
-                self.assertIn("https://challenges.cloudflare.com;", content)
+                self.assertIn("connect-src 'self' https://challenges.cloudflare.com https://www.bubblav.com", content)
+                self.assertIn("frame-src https://challenges.cloudflare.com https://www.bubblav.com", content)
+                self.assertEqual(content.count("https://challenges.cloudflare.com"), 3)
                 self.assertNotIn("connect-src 'none'", content)
 
 
@@ -801,7 +847,8 @@ class PremiumFinishV2Tests(unittest.TestCase):
             html = (output / "index.html").read_text()
             visual = Path(__file__).with_name("visual_acceptance.py").read_text()
 
-            self.assertEqual(html.count('data-contact-link href="mailto:'), 1)
+            self.assertEqual(html.count('data-contact-link href="mailto:'), 2)
+            self.assertEqual(html.split("<footer", 1)[1].count('data-contact-link href="mailto:'), 1)
             self.assertIn("RETALLY Premium Finish V2: customer contact clarity", css)
             self.assertIn(".home-simple .simple-footer > div:first-child{", css)
             self.assertIn("flex-direction:column;", css[css.index("RETALLY Premium Finish V2:"):])

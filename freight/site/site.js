@@ -196,6 +196,9 @@
     let sending = false;
     const fallbackLink = byId("auditEmailFallback");
     const submitButton = auditForm.querySelector("button[type='submit']");
+    const entryFieldset = auditForm.querySelector('fieldset[data-form-step="1"]');
+    // The static form is intentionally disabled if scripts fail to load.
+    if (submitButton) submitButton.disabled = false;
     const submitHint = auditForm.querySelector(".form-actions small");
 
     // Default remains the established email fallback. Only the verified backend
@@ -221,7 +224,7 @@
           serverReady = true;
           if (fallbackLink) fallbackLink.hidden = false;
           if (submitButton) submitButton.textContent = "Submit My Free Audit Request";
-          if (submitHint) submitHint.textContent = "Submitted securely to RETALLY. No freight files or credentials, please.";
+          if (submitHint) submitHint.textContent = "Secure form available. Complete the form and press Submit My Free Audit Request; nothing has been sent yet.";
           const widget = document.createElement("div");
           widget.id = "auditTurnstile";
           widget.className = "cf-turnstile";
@@ -280,7 +283,11 @@
       }
       if (!auditForm.querySelector("input[name='modes']:checked")) {
         setError("Choose at least one freight type.");
-        byId("modesGroup")?.scrollIntoView({ block: "center", behavior: "smooth" });
+        // A scrolling-only error strands keyboard focus on Submit.
+        // Focus the first freight choice so the required correction is actionable.
+        const firstMode = byId("modesGroup")?.querySelector("input[name='modes']");
+        if (firstMode) firstMode.focus();
+        else byId("modesGroup")?.scrollIntoView({ block: "center", behavior: "smooth" });
         return false;
       }
       return true;
@@ -289,7 +296,7 @@
     for (const field of all("input,select,textarea", auditForm)) {
       field.addEventListener("input", () => {
         if (field.checkValidity()) field.removeAttribute("aria-invalid");
-        pendingRequestKey = null;
+        if (!sending) pendingRequestKey = null;
         setError("");
       });
     }
@@ -372,6 +379,10 @@
       }
       const copyStatus = byId("copyStatus");
       if (copyStatus) copyStatus.textContent = "";
+      const fallback = byId("auditCopyFallback");
+      if (fallback) fallback.hidden = true;
+      const manual = byId("auditManualSummary");
+      if (manual) manual.value = "";
       setError("");
       byId("fullName")?.focus({ preventScroll: true });
       auditForm.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -379,7 +390,16 @@
 
     fallbackLink?.addEventListener("click", (event) => {
       event.preventDefault();
+      // Do not prepare a duplicate email while secure submission is in flight.
+      if (sending) return;
       if (validate()) prepareEmailDraft();
+    });
+
+    // An anchor inside a disabled fieldset is still clickable. Keep the
+    // static contact escape available unless an online request is in flight.
+    const staticEmailLink = byId("auditStaticFallback")?.querySelector("a[data-contact-link]");
+    staticEmailLink?.addEventListener("click", (event) => {
+      if (sending) event.preventDefault();
     });
 
     auditForm.addEventListener("submit", async (event) => {
@@ -411,6 +431,7 @@
         idempotencyKey: pendingRequestKey, turnstileToken
       };
       sending = true;
+      if (entryFieldset) entryFieldset.disabled = true;
       if (submitButton) {
         submitButton.disabled = true;
         submitButton.textContent = "Submitting securely…";
@@ -456,6 +477,19 @@
           // Delayed/failed mail must not strand an otherwise durable lead.
           // Preserve the SAME reference so staff can reconcile any email.
           const contactEmail = document.querySelector('meta[name="freight-contact-email"]')?.content.trim() || "";
+          const recipient = byId("auditRecipient");
+          if (contactEmail && recipient && fallbackInstructions) {
+            recipient.href = "mailto:" + contactEmail;
+            recipient.textContent = contactEmail;
+            fallbackInstructions.replaceChildren(
+              "If your email draft does not open, send the saved request details to ",
+              recipient,
+              ". The online request is already saved; do not submit it again."
+            );
+            fallbackInstructions.hidden = false;
+            const copyRecipient = byId("copyAuditEmail");
+            if (copyRecipient) copyRecipient.hidden = false;
+          }
           preparedSummary = buildSummary(result.reference);
           const sendLink = byId("sendAuditRequest");
           if (contactEmail && sendLink) {
@@ -494,6 +528,7 @@
       } finally {
         window.clearTimeout(timeout);
         sending = false;
+        if (entryFieldset) entryFieldset.disabled = false;
         if (submitButton) {
           submitButton.disabled = false;
           submitButton.textContent = "Submit My Free Audit Request";
@@ -508,11 +543,24 @@
 
     byId("copyAuditSummary")?.addEventListener("click", async () => {
       const output = byId("copyStatus");
+      if (!preparedSummary || !output) return;
       try {
         await navigator.clipboard.writeText(preparedSummary);
         output.textContent = "Request details copied.";
       } catch (_error) {
-        output.textContent = "Copy was unavailable. Use the prepared email instead.";
+        // Preserve the actual prepared request when the mail app AND clipboard
+        // are unavailable. The visitor must copy and send it themselves.
+        const fallback = byId("auditCopyFallback");
+        const manual = byId("auditManualSummary");
+        if (fallback && manual) {
+          manual.value = preparedSummary;
+          fallback.hidden = false;
+          manual.focus({preventScroll: true});
+          manual.select();
+          output.textContent = "Clipboard unavailable. Select and copy the request below; this does not send an email.";
+        } else {
+          output.textContent = "Copy unavailable. Open the prepared email again.";
+        }
       }
     });
 

@@ -219,12 +219,12 @@ BUBBLAV_CONNECT_POLICY = (
     "https://www.bubblav.com https://bubblav.com https://*.bubblav.com"
 )
 BUBBLAV_POLICY_REPLACEMENTS = (
-    ("script-src 'self';", "script-src 'self' https://www.bubblav.com;"),
+    ("script-src 'self';", "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;"),
     ("style-src 'self';", "style-src 'self' 'unsafe-inline';"),
     ("img-src 'self' data:;", "img-src 'self' data: https://www.bubblav.com https://*.bubblav.com;"),
     (
         "connect-src 'none';",
-        f"connect-src {BUBBLAV_CONNECT_POLICY}; frame-src {BUBBLAV_CONNECT_POLICY};",
+        f"connect-src 'self' https://challenges.cloudflare.com {BUBBLAV_CONNECT_POLICY}; frame-src https://challenges.cloudflare.com {BUBBLAV_CONNECT_POLICY};",
     ),
 )
 
@@ -424,6 +424,17 @@ def build(
     for name in PUBLIC_CONTACT_PAGES:
         text_bundle[name] = _embed_bubblav(text_bundle[name], name)
     text_bundle["_headers"] = _allow_bubblav(text_bundle["_headers"], "_headers")
+    # Reject a build whose two effective CSP layers would block same-origin
+    # inquiry requests or the Cloudflare Turnstile challenge. Browser CSP
+    # enforces the intersection of the response header and HTML meta policy.
+    for policy_asset in ("index.html", "_headers"):
+        for required in (
+            "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com;",
+            "connect-src 'self' https://challenges.cloudflare.com",
+            "frame-src https://challenges.cloudflare.com",
+        ):
+            if required not in text_bundle[policy_asset]:
+                raise ValueError(f"Secure intake blocked by CSP: {policy_asset}")
     # Cloudflare's edge-side Email Address Obfuscation otherwise rewrites each
     # verified public mailto href into /cdn-cgi/l/email-protection, which
     # returns HTTP 404 to crawlers. Keep the rest of the zone protected.

@@ -133,11 +133,11 @@ jobs:
           # Require the precise existing vendor and Turnstile allowlist. The
           # BubblaV public-chat integration was merged independently; never
           # weaken this test by accepting arbitrary script/connect hosts.
-          connect = ("connect-src 'self' https://www.bubblav.com "
-                     "https://bubblav.com https://*.bubblav.com "
-                     "https://challenges.cloudflare.com;")
-          frame = ("frame-src https://www.bubblav.com https://bubblav.com "
-                   "https://*.bubblav.com https://challenges.cloudflare.com;")
+          connect = ("connect-src 'self' https://challenges.cloudflare.com "
+                     "https://www.bubblav.com https://bubblav.com "
+                     "https://*.bubblav.com;")
+          frame = ("frame-src https://challenges.cloudflare.com https://www.bubblav.com "
+                   "https://bubblav.com https://*.bubblav.com;")
           script = ("script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com "
                     "https://static.cloudflareinsights.com/beacon.min.js;")
           for published in (home, recovery, headers):

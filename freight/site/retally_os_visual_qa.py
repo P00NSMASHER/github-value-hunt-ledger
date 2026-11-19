@@ -165,6 +165,8 @@ def run(out: Path) -> dict:
             assert '1' in page.locator('#metrics .tile').nth(2).inner_text()
             assert '1' in page.locator('#metrics .tile').nth(3).inner_text()
             assert page.locator("#recent article").count() == 2, "QA fixture must be excluded from real summary"
+            nums=page.locator('#urgent .priority-number').all_inner_texts()
+            assert nums==[str(i).zfill(2) for i in range(1,len(nums)+1)], nums
             assert page.evaluate("document.documentElement.scrollWidth <= innerWidth+1")
             assert page.locator("#mobile-dock").is_visible() == (width <= 760)
             page.screenshot(path=str(out / f"{label}-overview.png"), full_page=True)
@@ -176,6 +178,8 @@ def run(out: Path) -> dict:
                 page.locator("#case-filters button[data-filter=test]").click()
                 assert page.locator("#case-list article[data-ref]:visible").count() == 1
                 page.locator("#case-filters button[data-filter=live]").click()
+                page.evaluate('window.scrollTo(0,0)')
+                page.wait_for_timeout(280)
                 page.screenshot(path=str(out / "iphone-cases.png"), full_page=True)
                 page.locator("#more-toggle").click()
                 assert page.locator("#more-sheet").is_visible()
@@ -184,6 +188,8 @@ def run(out: Path) -> dict:
                 assert page.locator("#more-sheet").is_hidden()
                 page.locator("#mobile-dock button[data-tab=tasks]").click()
                 assert page.locator("#task-list article[data-task-id]:visible").count() == 1
+                page.evaluate('window.scrollTo(0,0)')
+                page.wait_for_timeout(280)
                 page.screenshot(path=str(out / "iphone-followups.png"), full_page=True)
                 page.locator('#task-filters button[data-filter=test]').click()
                 assert page.locator('#task-list article[data-task-id]:visible').count() == 1
@@ -209,6 +215,12 @@ def run(out: Path) -> dict:
                 page.locator('#drafts .draft').first.get_by_role('button',name='Mark reviewed').click()
                 assert any(x['action'] == 'review_draft' for x in posts)
                 assert all(x["action"] in {"save_task","save_case","save_draft","review_draft"} for x in posts)
+                assert page.locator('#drafts .draft').first.locator('textarea').is_hidden(), 'Draft editor should be collapsed initially'
+                page.locator('#drafts .draft').first.locator('details summary').click()
+                assert page.locator('#drafts .draft').first.locator('textarea').is_visible()
+                page.locator('#drafts .draft').first.locator('details summary').click()
+                page.evaluate('window.scrollTo(0,0)')
+                page.wait_for_timeout(280)
                 page.screenshot(path=str(out / "desktop-content.png"), full_page=True)
             results.append({"width": width, "tabs": 7, "kpis": 4,
                             "horizontalOverflow": False, "consoleErrors": len(problems)})

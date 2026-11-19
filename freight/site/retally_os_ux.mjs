@@ -177,7 +177,7 @@ drawDrafts=function(){
  originalDrawDrafts();
  for(const card of byId('drafts').querySelectorAll('.draft')){
   const header=card.querySelector('.controls');
-  const body=card.querySelector('label.field');
+  const body=card.querySelector(':scope > label.field');
   const state=card.querySelector('.tag');
   const actions=card.querySelector('.actions');
   if(!header||!body||!state||!actions)continue;
@@ -205,13 +205,13 @@ drawToday=function(){
    kpi('Needs review',review.length,'Open the case pipeline','cases',review.length>0),
    kpi('Open follow-ups',open.length,'Review outstanding work','tasks',false),
    kpi('Overdue tasks',overdue.length,'Past the due date','tasks',overdue.length>0));
- const urgent=byId('urgent');clear(urgent);
- if(overdue.length)urgent.append(priorityRow(1,overdue.length+' overdue follow-up'+(overdue.length===1?'':'s'),'These have passed their saved due dates.','Review','tasks'));
- else if(review.length)urgent.append(priorityRow(1,review.length+' case'+(review.length===1?'':'s')+' need attention','Qualify a new inquiry or record the reason for a hold.','Open cases','cases'));
- else if(!cases.length)urgent.append(priorityRow(1,'Ready for your first genuine inquiry','Your intake is online. The recorded QA submission is not a real customer.','View cases','cases'));
- else urgent.append(priorityRow(1,'No urgent items in this snapshot','Check the case pipeline for new evidence and follow-up opportunities.','Cases','cases'));
- if(open.length&&!overdue.length)urgent.append(priorityRow(2,open.length+' open follow-up'+(open.length===1?'':'s'),'Track due dates and completion evidence.','Work queue','tasks'));
- if(current.drafts.length)urgent.append(priorityRow(3,current.drafts.length+' private content draft'+(current.drafts.length===1?'':'s'),'Reviewed drafts remain private until separately published.','Review','social'));
+ const urgent=byId('urgent');clear(urgent);let priorityOrder=1;
+ if(overdue.length)urgent.append(priorityRow(priorityOrder++,overdue.length+' overdue follow-up'+(overdue.length===1?'':'s'),'These have passed their saved due dates.','Review','tasks'));
+ else if(review.length)urgent.append(priorityRow(priorityOrder++,review.length+' case'+(review.length===1?'':'s')+' need attention','Qualify a new inquiry or record the reason for a hold.','Open cases','cases'));
+ else if(!cases.length)urgent.append(priorityRow(priorityOrder++,'Ready for your first genuine inquiry','Your intake is online. The recorded QA submission is not a real customer.','View cases','cases'));
+ else urgent.append(priorityRow(priorityOrder++,'No urgent items in this snapshot','Check the case pipeline for new evidence and follow-up opportunities.','Cases','cases'));
+ if(open.length&&!overdue.length)urgent.append(priorityRow(priorityOrder++,open.length+' open follow-up'+(open.length===1?'':'s'),'Track due dates and completion evidence.','Work queue','tasks'));
+ if(current.drafts.length)urgent.append(priorityRow(priorityOrder++,current.drafts.length+' private content draft'+(current.drafts.length===1?'':'s'),'Reviewed drafts remain private until separately published.','Review','social'));
 };
 const originalDrawGrowth=drawGrowth;
 drawGrowth=function(){

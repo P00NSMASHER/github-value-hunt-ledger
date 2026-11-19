@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="v16-evidence-preflight.css?v=1">
   <link rel="stylesheet" href="foundry.css?v=retally-type-20261008">
   <script src="commercial-config.js?v=free-audit-contingency-v5" defer></script>
-  <script src="site.js?v=qualified-funnel-20261110" defer></script>
+  <script src="site.js?v=qualified-funnel-manual-copy-20261115" defer></script>
   <script src="v16-evidence-preflight.js?v=1" defer></script>
   <script type="application/ld+json">
   {
@@ -215,7 +215,7 @@
         </article>
       </div>
       <p class="simple-terms">Rate, scope, and exclusions agreed in writing. Recovery is not guaranteed. <a href="engagement-framework.html">Engagement terms</a></p>
-      <div class="simple-pricing-options"><a href="freight-audit-pricing.html">Fixed-Fee Forensic Audit · Available by request</a>
+      <div class="simple-pricing-options">
         <details class="simple-calculator"><summary>Estimate the recovery fee</summary>
           <div class="fee-calculator" id="fee-calculator">
             <div class="calculator-copy"><h3>What would you retain?</h3><p>Use eligible recovered funds after reversals.</p><label><span>Actual fee-eligible recovered funds</span><span class="money-input"><i>$</i><input id="actualRecovery" type="number" min="0" max="1000000000" step="1000" value="100000" inputmode="decimal"></span></label></div>
@@ -241,7 +241,7 @@
               <label><span>Approximate annual freight spend</span><select id="annualSpend" name="annualSpend" required><option value="">Select range</option><option>Under $250k</option><option>$250k&ndash;$1M</option><option>$1M&ndash;$5M</option><option>$5M&ndash;$20M</option><option>$20M+</option></select></label>
             </div>
 
-            <fieldset class="choice-group" id="modesGroup"><legend>Freight types used <span>Choose all that apply</span></legend><div class="choice-grid"><label><input type="checkbox" name="modes" value="Parcel"><span>Parcel</span></label><label><input type="checkbox" name="modes" value="LTL"><span>LTL</span></label><label><input type="checkbox" name="modes" value="FTL"><span>FTL</span></label><label><input type="checkbox" name="modes" value="Intermodal"><span>Intermodal</span></label><label><input type="checkbox" name="modes" value="Ocean / air"><span>Ocean / air</span></label><label><input type="checkbox" name="modes" value="Other"><span>Other</span></label></div></fieldset>
+            <fieldset class="choice-group" id="modesGroup"><legend>Freight types used <span>Choose at least one</span></legend><div class="choice-grid"><label><input type="checkbox" name="modes" value="Parcel"><span>Parcel</span></label><label><input type="checkbox" name="modes" value="LTL"><span>LTL</span></label><label><input type="checkbox" name="modes" value="FTL"><span>FTL</span></label><label><input type="checkbox" name="modes" value="Intermodal"><span>Intermodal</span></label><label><input type="checkbox" name="modes" value="Ocean / air"><span>Ocean / air</span></label><label><input type="checkbox" name="modes" value="Other"><span>Other</span></label></div></fieldset>
 
             <details class="qualification-details">
               <summary>Optional details</summary>
@@ -259,11 +259,18 @@
 
             <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
             <a class="text-button" id="auditEmailFallback" href="#contact-pending" hidden>Use the email option instead</a>
-            <div class="form-actions form-actions-simple"><button class="button button-signal" type="submit">Open My Free Audit Request</button><small>Opens an email draft. Review it and press Send.</small></div>
+            <div class="form-actions form-actions-simple"><button class="button button-signal" disabled type="submit">Open My Free Audit Request</button><small>Opens an email draft. Review it and press Send.</small></div>
+            <p id="auditStaticFallback" class="audit-static-fallback">If this form is unavailable, <a data-contact-link href="#contact-pending">Email our team directly</a>. This opens an email draft; review it and press Send. Nothing has been submitted automatically. Do not attach freight records, contracts, or credentials.</p>
+            <noscript><p class="audit-nojs">JavaScript is off, so this form cannot prepare or send an audit request. Nothing has been submitted. <a href="about.html#location">see RETALLY's business contact details</a> with only general business details; do not send invoices, rate agreements, credentials or payment data.</p></noscript>
           </fieldset>
         </form>
 
-        <div class="audit-ready" id="auditReady" hidden tabindex="-1"><span class="ready-mark" aria-hidden="true">&#10003;</span><p class="eyebrow">Email prepared — not sent</p><h3>Review it, then press Send.</h3><p>No freight files are attached.</p><a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Prepared Email Again</a><button class="text-button" id="editAuditRequest" type="button">Edit request details</button><button class="text-button" id="copyAuditSummary" type="button">Copy request details instead</button><p class="audit-manual-fallback">If no email draft opens, copy the request details and send them to <a id="auditRecipient" href="#contact-pending">RETALLY business email</a>. Your request has not been sent yet.</p><button class="text-button" id="copyAuditEmail" type="button">Copy recipient email address</button><span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span></div>
+        <div class="audit-ready" id="auditReady" hidden tabindex="-1"><span class="ready-mark" aria-hidden="true">&#10003;</span><p class="eyebrow">Email prepared — not sent</p><h3>Review it, then press Send.</h3><p>No freight files are attached.</p><a class="button button-cobalt" id="sendAuditRequest" href="#contact-pending">Open Prepared Email Again</a><button class="text-button" id="editAuditRequest" type="button">Edit request details</button><button class="text-button" id="copyAuditSummary" type="button">Copy request details instead</button><p class="audit-manual-fallback">If no email draft opens, copy the request details and send them to <a id="auditRecipient" href="#contact-pending">RETALLY business email</a>. Your request has not been sent yet.</p><button class="text-button" id="copyAuditEmail" type="button">Copy recipient email address</button><span class="copy-status" id="copyStatus" role="status" aria-live="polite"></span>
+          <div id="auditCopyFallback" class="audit-copy-fallback" hidden>
+            <label class="field-wide" for="auditManualSummary"><span>Request details for manual copying</span></label>
+            <textarea id="auditManualSummary" rows="10" readonly spellcheck="false" aria-describedby="auditCopyHelp"></textarea>
+            <p id="auditCopyHelp">Select and copy this prepared request into your own email. Nothing is sent automatically. Do not add invoices or credentials.</p>
+          </div></div>
       </div>
     </div>
   </section>
