@@ -328,7 +328,7 @@ class PublicBuildTests(unittest.TestCase):
             self.assertIn("Open My Free Audit Request", page)
             self.assertIn("approved secure intake route", page)
             self.assertNotIn("Fixed-Fee Forensic Audit", page)
-            self.assertNotIn('href="freight-audit-pricing.html"', page)
+            self.assertIn('href="freight-audit-pricing.html"', page)
             self.assertIn("Potential recovery", page)
             self.assertIn("Approved claim value", page)
             self.assertIn("Actual recovered funds", page)
