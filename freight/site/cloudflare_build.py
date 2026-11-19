@@ -29,37 +29,39 @@ EXPECTED_FILES = len(FREIGHT_PUBLIC_FILES) + len(RECOVERY_PUBLIC_FILES) + len(AD
 
 
 def allow_verified_pages_inquiry(bundle: Path) -> None:
-    """Enable only Pages' same-origin API and managed Turnstile script/frame.
+    """Preserve verified inquiry and Turnstile CSP while enabling Pages analytics.
 
-    The original GitHub Pages bundle retains its BubblaV-only connections
-    and prepares email drafts. The Cloudflare build also permits the existing
-    same-origin inquiry API and managed Turnstile challenge, plus the precise
+    The public bundle already permits its same-origin inquiry API and managed
+    Turnstile challenge. The Cloudflare build additionally permits the precise
     Cloudflare Web Analytics beacon URL for the already-enabled automatic RUM.
     Its ingestion URL remains same-origin and is covered by connect-src 'self'.
     """
     for name in ("index.html", "_headers"):
         path = bundle / name
         content = path.read_text(encoding="utf-8")
-        script = "script-src 'self' https://www.bubblav.com;"
-        connect = ("connect-src https://www.bubblav.com https://bubblav.com "
-                   "https://*.bubblav.com;")
-        frame = ("frame-src https://www.bubblav.com https://bubblav.com "
-                 "https://*.bubblav.com;")
+        script = (
+            "script-src 'self' https://www.bubblav.com "
+            "https://challenges.cloudflare.com;"
+        )
+        connect = (
+            "connect-src 'self' https://challenges.cloudflare.com "
+            "https://www.bubblav.com https://bubblav.com "
+            "https://*.bubblav.com;"
+        )
+        frame = (
+            "frame-src https://challenges.cloudflare.com "
+            "https://www.bubblav.com https://bubblav.com "
+            "https://*.bubblav.com;"
+        )
         if any(content.count(item) != 1 for item in (script, connect, frame)):
             raise RuntimeError(f"Cloudflare CSP source changed unexpectedly: {name}")
         content = content.replace(
-            script, "script-src 'self' https://www.bubblav.com https://challenges.cloudflare.com https://static.cloudflareinsights.com/beacon.min.js;"
-        )
-        content = content.replace(
-            connect, "connect-src 'self' https://www.bubblav.com https://bubblav.com "
-            "https://*.bubblav.com https://challenges.cloudflare.com;"
-        )
-        content = content.replace(
-            frame, "frame-src https://www.bubblav.com https://bubblav.com "
-            "https://*.bubblav.com https://challenges.cloudflare.com;"
+            script,
+            "script-src 'self' https://www.bubblav.com "
+            "https://challenges.cloudflare.com "
+            "https://static.cloudflareinsights.com/beacon.min.js;",
         )
         path.write_text(content, encoding="utf-8")
-
 
 def build(output: Path = OUTPUT_DIR) -> Path:
     contact = os.environ.get("FREIGHT_CONTACT_EMAIL", "").strip().lower()
