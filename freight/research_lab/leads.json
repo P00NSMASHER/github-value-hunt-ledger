@@ -8648,6 +8648,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "recoveryos"
+      ],
+      "first_seen": "2026-11-20",
+      "id": "a5fe4932609e790e789cea236f6da23de3d61b92c749e0c6d737f7c689e308a5",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/YP-TECH47/Autonomous-Document-Processing-Pipeline-for-Invoices"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -13673,6 +13689,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "c9c004a61378f3755967d190c30ae914be24a725598badfee7180e24889f4fc5",
+  "entries_sha256": "e3a378972b03b287b09c7b41d3dd7626e916cceef065c2e70d3796fca11e2a12",
   "schema_version": 1
 }
