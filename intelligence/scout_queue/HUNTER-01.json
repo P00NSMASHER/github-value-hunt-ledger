@@ -1,15 +1,55 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
   "candidates": [
+    {
+      "archived": false,
+      "default_branch": "master",
+      "description": "Python client for tardis.dev - historical tick-level cryptocurrency market data replay API.",
+      "discovery_query": "market data replay",
+      "exact_revision": "a910d61120882955ff0bf64ccfcc2cfe35ff5461",
+      "forks": 21,
+      "primary_language": "Python",
+      "published_license_spdx": "MPL-2.0",
+      "pushed_at": "2026-11-22T20:21:16Z",
+      "repository": "tardis-dev/tardis-python",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 428,
+      "stars": 151,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "cryptocurrency-api",
+        "cryptocurrency-prices",
+        "historical-data",
+        "orderbook",
+        "orderbook-tick-data"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 3,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 9,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 58,
+      "url": "https://github.com/tardis-dev/tardis-python"
+    },
     {
       "archived": false,
       "default_branch": "main",
@@ -61,6 +101,52 @@
     },
     {
       "archived": false,
+      "default_branch": "master",
+      "description": "Algorithmic trading research and execution platform for futures \u2014 test a strategy against real market data bar by bar, replay the tape as it happened, and follow it live.",
+      "discovery_query": "market data replay",
+      "exact_revision": "2fdb2381e74d8d19ee59d294797f9e55a5d87545",
+      "forks": 0,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "NOASSERTION",
+      "pushed_at": "2026-11-22T17:43:07Z",
+      "repository": "wealthwise-advisors/trading-platform",
+      "root_code_signals": [
+        ".github",
+        "docker-compose.yml",
+        "dockerfile",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 13427,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "algorithmic-trading",
+        "backtesting-engine",
+        "market-data-analysis",
+        "quantitative-finance-",
+        "rithmic",
+        "schwab-api",
+        "technical-analysis",
+        "trading-strategies"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 15,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 54,
+      "url": "https://github.com/wealthwise-advisors/trading-platform"
+    },
+    {
+      "archived": false,
       "default_branch": "main",
       "description": "Honest-by-construction AI strategy lab for crypto futures: describe a target, an agent writes the strategy, a Rust engine backtests it, and walk-forward plus a fenced holdout decide if it counts. macOS app + MCP server.",
       "discovery_query": "walk forward backtesting",
@@ -70,6 +156,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-07T06:41:41Z",
       "repository": "pulseai-labs/pulse-trader",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -118,6 +205,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T06:27:19Z",
       "repository": "0xArchiveIO/sdk-typescript",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -201,11 +289,11 @@
       "default_branch": "main",
       "description": "Tradier market data, accounts and trading for Open Meridian, a data, custody and connectivity plugin",
       "discovery_query": "tradier",
-      "exact_revision": "5601c2439c635d3f15aaf924e26ecfe477198b0d",
+      "exact_revision": "583cc5da5b50f9c07111c1c33412b3b03019ca9d",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-03T04:12:25Z",
+      "pushed_at": "2026-11-20T11:37:26Z",
       "repository": "open-meridian/plugin-tradier",
       "root_code_signals": [
         ".github",
@@ -215,7 +303,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 429,
+      "size_kb": 554,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -399,14 +487,55 @@
     },
     {
       "archived": false,
+      "default_branch": "develop",
+      "description": "Local quantitative research platform for turning market data into reproducible evidence, hypotheses, strategies, and validated trading research through causal data collection, market-state modeling, replay, walk-forward testing, and paper execution.",
+      "discovery_query": "market data replay",
+      "exact_revision": "ef6c1e720550e8a0db1da72cc311bac142ca3c0f",
+      "forks": 0,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-22T17:35:09Z",
+      "repository": "elijahbrookss/quant-trad",
+      "root_code_signals": [
+        ".github",
+        "makefile",
+        "pyproject.toml",
+        "src",
+        "tests"
+      ],
+      "size_kb": 50745,
+      "stars": 1,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "crypto",
+        "quant",
+        "trading",
+        "trading-algorithms"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 0,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 12,
+        "stars": 1,
+        "substantive_size": 4,
+        "topics": 4
+      },
+      "triage_score": 50,
+      "url": "https://github.com/elijahbrookss/quant-trad"
+    },
+    {
+      "archived": false,
       "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "d8ad3c7de741b5384a837c42b683b1c561183212",
+      "exact_revision": "c402ecd987c6b144835618fc13c6fca4edf3a12c",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T06:36:04Z",
+      "pushed_at": "2026-11-22T20:28:28Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -416,7 +545,7 @@
         "src",
         "test"
       ],
-      "size_kb": 77006,
+      "size_kb": 87510,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -616,143 +745,11 @@
       },
       "triage_score": 47,
       "url": "https://github.com/AlgorithmicMind/regimelab"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Historical market-data replay lab using Kafka, Spark, PostgreSQL, and Next.js to inspect late, duplicate, and failed deliveries.",
-      "discovery_query": "market data replay",
-      "exact_revision": "3fb9eba180dbf496480ea887f0410d868a90f4d5",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "NOASSERTION",
-      "pushed_at": "2026-11-05T22:31:05Z",
-      "repository": "anusharama100/marketpulse",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "makefile",
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 1226,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "data-engineering",
-        "kafka",
-        "nextjs",
-        "postgresql",
-        "spark",
-        "stream-processing"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 9,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 47,
-      "url": "https://github.com/anusharama100/marketpulse"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Forecasting hourly MISO grid demand and benchmarking it against the grid operator's own day ahead forecast. EIA API, Open-Meteo, walk forward backtest.",
-      "discovery_query": "walk forward backtesting",
-      "exact_revision": "d50197c95dc61022eef74077f1c3c749531b43c4",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T19:11:13Z",
-      "repository": "austi20/miso-demand-forecaster",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "src",
-        "tests"
-      ],
-      "size_kb": 354,
-      "stars": 0,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "data-science",
-        "eia",
-        "electricity",
-        "energy",
-        "forecasting",
-        "mlops",
-        "pandas",
-        "python",
-        "time-series"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 9,
-        "stars": 0,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 47,
-      "url": "https://github.com/austi20/miso-demand-forecaster"
-    },
-    {
-      "archived": false,
-      "default_branch": "master",
-      "description": "Open-source Python toolkit for quantitative research on Borsa Istanbul (BIST): data, features, walk-forward backtesting, risk/portfolio, backtest robustness (CPCV/PBO), diagnostics, reports, paper-trading bridge.",
-      "discovery_query": "walk forward trading backtest python open source",
-      "exact_revision": "27a690bb1073c43bf1145eae82c1545567a00482",
-      "forks": 0,
-      "primary_language": "Python",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T13:45:42Z",
-      "repository": "HaasEnjoyer/quanttro",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        "pyproject.toml",
-        "tests"
-      ],
-      "size_kb": 260,
-      "stars": 2,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "algorithmic-trading",
-        "backtesting",
-        "bist",
-        "overfitting",
-        "portfolio-optimization",
-        "prop-firm",
-        "python",
-        "quantitative-finance",
-        "risk-management"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 2,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 46,
-      "url": "https://github.com/HaasEnjoyer/quanttro"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T08:21:22.655317+00:00",
+  "generated_at": "2026-11-22T20:41:23.039602+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
