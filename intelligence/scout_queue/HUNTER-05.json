@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 67,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -21,6 +21,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T23:31:51Z",
       "repository": "ast-grep/ast-grep",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -66,11 +67,11 @@
       "default_branch": "master",
       "description": "OWASP dep-scan is a next-generation security and risk audit tool based on known vulnerabilities, advisories, and license limitations for project dependencies. Both local repositories and container images are supported as the input, and the tool is ideal for integration.",
       "discovery_query": "dependency license audit",
-      "exact_revision": "19c44132b5d3433970e8f5623ed4b68278478c42",
-      "forks": 140,
+      "exact_revision": "e8fcc7e584a3351037f8a7629444c2ec13fff789",
+      "forks": 144,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T02:32:04Z",
+      "pushed_at": "2026-11-22T13:44:37Z",
       "repository": "owasp-dep-scan/dep-scan",
       "root_code_signals": [
         ".github",
@@ -79,8 +80,8 @@
         "pyproject.toml",
         "test"
       ],
-      "size_kb": 22488,
-      "stars": 1329,
+      "size_kb": 33826,
+      "stars": 1464,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "compliance",
@@ -107,11 +108,11 @@
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 11,
-        "stars": 12,
+        "stars": 13,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 65,
+      "triage_score": 66,
       "url": "https://github.com/owasp-dep-scan/dep-scan"
     },
     {
@@ -173,6 +174,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-05T23:47:18Z",
       "repository": "mondaycom/vibe",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json"
@@ -221,11 +223,11 @@
       "default_branch": "trunk",
       "description": "TypeScript geospatial SDK: one protocol-neutral contract over GeoServices REST, OGC API, STAC, WMS/WMTS/WFS, and OData \u2014 MapLibre-first runtime, GIS widget-migration codemod, and a platform-free MCP server.",
       "discovery_query": "typescript codemod",
-      "exact_revision": "7346a0b9c8da5673b9b15a2e88f092476b97f993",
+      "exact_revision": "1fc899384b4c0d2d8e0cb547fd925cc819905b88",
       "forks": 1,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T04:28:14Z",
+      "pushed_at": "2026-11-22T20:40:23Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -234,8 +236,8 @@
         "src",
         "test"
       ],
-      "size_kb": 1795521,
-      "stars": 5,
+      "size_kb": 1900317,
+      "stars": 6,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "geojson",
@@ -421,6 +423,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T13:27:41Z",
       "repository": "sprintsynergyio/playwright-migrate",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -464,18 +467,18 @@
       "default_branch": "main",
       "description": "Test impact analysis for .NET - run only the tests your diff can actually affect.",
       "discovery_query": "test impact analysis",
-      "exact_revision": "7411d5eaca634f4442794c844c81412960972d77",
-      "forks": 2,
+      "exact_revision": "5327032b64edd9c20cac16b97d5a5cbfdbcb3082",
+      "forks": 3,
       "primary_language": "C#",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T20:46:16Z",
+      "pushed_at": "2026-11-22T19:48:27Z",
       "repository": "SebHenn/dotnet-tia",
       "root_code_signals": [
         ".github",
         "src",
         "tests"
       ],
-      "size_kb": 2315,
+      "size_kb": 1984,
       "stars": 6,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -549,6 +552,50 @@
       },
       "triage_score": 51,
       "url": "https://github.com/adityareddy-dev/otel-js-upgrade"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "Code mode for agents: turn any API or host capability into an action that code can call",
+      "discovery_query": "typescript codemod",
+      "exact_revision": "88de08941f62c52ecfde9f763ecb8bc8e8bad5b3",
+      "forks": 17,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-22T12:23:24Z",
+      "repository": "shift-labs-ai/codemode",
+      "root_code_signals": [
+        ".github",
+        "package.json"
+      ],
+      "size_kb": 6000,
+      "stars": 168,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "agent",
+        "api",
+        "cli",
+        "javascript",
+        "npm",
+        "plugins",
+        "quickjs",
+        "sandbox",
+        "tools",
+        "typescript"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 3,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 4,
+        "stars": 9,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 50,
+      "url": "https://github.com/shift-labs-ai/codemode"
     },
     {
       "archived": false,
@@ -744,67 +791,11 @@
       },
       "triage_score": 49,
       "url": "https://github.com/ivanDev237/upstreamfix"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Upgrade agent for TypeScript apps: when an API changes, Shim opens one tested pull request. First up: Vercel AI SDK 6 to 7",
-      "discovery_query": "typescript codemod",
-      "exact_revision": "d524fe0eb0ddb01fc875b366f80950b4200c4f0b",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-07T04:14:51Z",
-      "repository": "JayanthMalladi/shim",
-      "root_code_signals": [
-        ".github",
-        "package.json",
-        "src",
-        "test"
-      ],
-      "size_kb": 9564,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai",
-        "ai-agents",
-        "ai-sdk",
-        "automation",
-        "breaking-changes",
-        "cli",
-        "codemod",
-        "depenedency-management",
-        "developer-tools",
-        "devtools",
-        "llm",
-        "migration",
-        "nodejs",
-        "pull-requests",
-        "refactoring",
-        "static-analysis",
-        "ts-morph",
-        "typescript",
-        "upgrade",
-        "vercel-ai-sdk"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 10,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 49,
-      "url": "https://github.com/JayanthMalladi/shim"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-07T04:55:01.651525+00:00",
+  "generated_at": "2026-11-22T20:49:06.471435+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
