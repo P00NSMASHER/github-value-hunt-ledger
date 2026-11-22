@@ -4583,6 +4583,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "capturebrief"
+      ],
+      "first_seen": "2026-11-22",
+      "id": "5616278c933109c97341ae0310e0bc5c5328011788d41c4ce7a4d1f39f74dcf5",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/CodePulseHQ/us-federal-opportunities-api"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "permitplate"
       ],
       "first_seen": "2026-10-23",
@@ -13689,6 +13705,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "e3a378972b03b287b09c7b41d3dd7626e916cceef065c2e70d3796fca11e2a12",
+  "entries_sha256": "763cec7afbc581038d91e0c08abb97e4077a40775e7e22cd9ab57b4a45f1cd16",
   "schema_version": 1
 }
