@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-22",
+  "as_of_utc_date": "2026-11-23",
   "buyer_opportunity_ground_truth": false,
   "external_customer_contacts": 0,
   "independent_issuance_outcome_labels": 0,
@@ -20,7 +20,7 @@
   "readback_exact_match": 3,
   "readback_missing": 0,
   "readback_unavailable": 0,
-  "receipt_sha256": "a3ff716bdd7238eefedf0cd8ac3b7eb855289c8c18150b7f77c607e3e6f9c2e7",
+  "receipt_sha256": "778fc166f612c4f1919ff3de26737516da361d1fa0fce1fca4128e56102c466f",
   "sample_canonical_sha256": "d5d77e5732b2dcee4f092f3c29f3275a67e35f5117cf35f74e0eac325fc24292",
   "sample_count": 20,
   "sample_original_rows_stored": 0,
