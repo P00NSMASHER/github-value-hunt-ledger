@@ -1,6 +1,6 @@
 {
   "api_metrics": {
-    "api_requests": 67,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
@@ -15,11 +15,11 @@
       "default_branch": "main",
       "description": "\u26a1A CLI tool for code structural search, lint and rewriting. Written in Rust",
       "discovery_query": "typescript codemod",
-      "exact_revision": "1e9830c8d038e728d98a5675cf48ca1c4c569136",
-      "forks": 494,
+      "exact_revision": "9065b02439d9b80aaa726ab41fcaa2f3854c66b3",
+      "forks": 509,
       "primary_language": "Rust",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T23:31:51Z",
+      "pushed_at": "2026-11-24T22:14:10Z",
       "repository": "ast-grep/ast-grep",
       "root_code_signals": [
         ".github",
@@ -27,8 +27,8 @@
         "pyproject.toml",
         "schemas"
       ],
-      "size_kb": 10978,
-      "stars": 16470,
+      "size_kb": 10851,
+      "stars": 16688,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ast",
@@ -66,11 +66,11 @@
       "default_branch": "master",
       "description": "OWASP dep-scan is a next-generation security and risk audit tool based on known vulnerabilities, advisories, and license limitations for project dependencies. Both local repositories and container images are supported as the input, and the tool is ideal for integration.",
       "discovery_query": "dependency license audit",
-      "exact_revision": "19c44132b5d3433970e8f5623ed4b68278478c42",
-      "forks": 140,
+      "exact_revision": "712978e2d145ed67d3c6b3103f6b1e53141ae9dd",
+      "forks": 146,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T02:32:04Z",
+      "pushed_at": "2026-11-24T09:12:23Z",
       "repository": "owasp-dep-scan/dep-scan",
       "root_code_signals": [
         ".github",
@@ -79,8 +79,8 @@
         "pyproject.toml",
         "test"
       ],
-      "size_kb": 22488,
-      "stars": 1329,
+      "size_kb": 33577,
+      "stars": 1468,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "compliance",
@@ -107,11 +107,11 @@
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 11,
-        "stars": 12,
+        "stars": 13,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 65,
+      "triage_score": 66,
       "url": "https://github.com/owasp-dep-scan/dep-scan"
     },
     {
@@ -119,13 +119,12 @@
       "default_branch": "main",
       "description": "Open-source test impact analysis for agent-driven CI",
       "discovery_query": "test impact analysis",
-      "exact_revision": "154663e807fade1b5e1ca351c6c521637b623b30",
-      "forks": 0,
+      "exact_revision": "cf3aa5d200dfc114be2cdf365ef2f1792482970d",
+      "forks": 7,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-06T13:49:55Z",
+      "pushed_at": "2026-11-24T17:53:32Z",
       "repository": "PramodBasavarajMenasi/siftwise",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "docker-compose.yml",
@@ -134,8 +133,8 @@
         "src",
         "tests"
       ],
-      "size_kb": 1960,
-      "stars": 5,
+      "size_kb": 2272,
+      "stars": 7,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "ai-agents",
@@ -151,15 +150,15 @@
       "triage_components": {
         "activity": 15,
         "description": 4,
-        "forks": 0,
+        "forks": 2,
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 15,
-        "stars": 3,
+        "stars": 4,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 56,
+      "triage_score": 59,
       "url": "https://github.com/PramodBasavarajMenasi/siftwise"
     },
     {
@@ -173,6 +172,7 @@
       "published_license_spdx": "UNKNOWN",
       "pushed_at": "2026-11-05T23:47:18Z",
       "repository": "mondaycom/vibe",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json"
@@ -218,14 +218,57 @@
     },
     {
       "archived": false,
+      "default_branch": "main",
+      "description": "Barrel file removal tool for JavaScript & TypeScript projects (ESM-only)",
+      "discovery_query": "typescript codemod",
+      "exact_revision": "0bef3595264285d7213301ef680755f54afb576b",
+      "forks": 4,
+      "primary_language": "TypeScript",
+      "published_license_spdx": "UNKNOWN",
+      "pushed_at": "2026-11-24T10:00:19Z",
+      "repository": "webpro-nl/unbarrelify",
+      "root_code_signals": [
+        ".github",
+        "package.json",
+        "src",
+        "test"
+      ],
+      "size_kb": 282,
+      "stars": 205,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "barrel",
+        "codemod",
+        "esm",
+        "files",
+        "imports",
+        "refactor",
+        "typescript"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 1,
+        "not_archived": 5,
+        "root_code_signals": 10,
+        "stars": 9,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 54,
+      "url": "https://github.com/webpro-nl/unbarrelify"
+    },
+    {
+      "archived": false,
       "default_branch": "trunk",
       "description": "TypeScript geospatial SDK: one protocol-neutral contract over GeoServices REST, OGC API, STAC, WMS/WMTS/WFS, and OData \u2014 MapLibre-first runtime, GIS widget-migration codemod, and a platform-free MCP server.",
       "discovery_query": "typescript codemod",
-      "exact_revision": "7346a0b9c8da5673b9b15a2e88f092476b97f993",
-      "forks": 1,
+      "exact_revision": "0b6b01059ab4f5a7125b8d282e291407a1fbfabf",
+      "forks": 2,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T04:28:14Z",
+      "pushed_at": "2026-11-24T23:02:10Z",
       "repository": "honua-io/honua-sdk-js",
       "root_code_signals": [
         ".github",
@@ -234,8 +277,8 @@
         "src",
         "test"
       ],
-      "size_kb": 1795521,
-      "stars": 5,
+      "size_kb": 1922643,
+      "stars": 8,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "geojson",
@@ -263,12 +306,52 @@
         "license_metadata": 5,
         "not_archived": 5,
         "root_code_signals": 13,
-        "stars": 3,
+        "stars": 4,
         "substantive_size": 2,
         "topics": 5
       },
-      "triage_score": 53,
+      "triage_score": 54,
       "url": "https://github.com/honua-io/honua-sdk-js"
+    },
+    {
+      "archived": false,
+      "default_branch": "main",
+      "description": "A pytest plugin that selectively runs tests affected by codechanges via git introspection, ASL parsing, and dependency graph analysis.",
+      "discovery_query": "test impact analysis",
+      "exact_revision": "861289aa13ddfe6225193410da1c7dd88a19fd15",
+      "forks": 3,
+      "primary_language": "Python",
+      "published_license_spdx": "MIT",
+      "pushed_at": "2026-11-24T16:19:35Z",
+      "repository": "promptromp/pytest-impacted",
+      "root_code_signals": [
+        ".github",
+        "pyproject.toml",
+        "tests"
+      ],
+      "size_kb": 3320,
+      "stars": 36,
+      "status": "PRE_VERIFICATION_CANDIDATE",
+      "topics": [
+        "ci",
+        "pytest",
+        "python",
+        "python3",
+        "unit-testing"
+      ],
+      "triage_components": {
+        "activity": 15,
+        "description": 4,
+        "forks": 1,
+        "license_metadata": 5,
+        "not_archived": 5,
+        "root_code_signals": 8,
+        "stars": 6,
+        "substantive_size": 4,
+        "topics": 5
+      },
+      "triage_score": 53,
+      "url": "https://github.com/promptromp/pytest-impacted"
     },
     {
       "archived": false,
@@ -421,6 +504,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-05T13:27:41Z",
       "repository": "sprintsynergyio/playwright-migrate",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -470,6 +554,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T20:46:16Z",
       "repository": "SebHenn/dotnet-tia",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "src",
@@ -699,112 +784,11 @@
       },
       "triage_score": 49,
       "url": "https://github.com/semitexa/laravel-ai-verify"
-    },
-    {
-      "archived": false,
-      "default_branch": "develop",
-      "description": "Automated, verified migrations for breaking npm SDK upgrades (Firebase Admin, Stripe). Self-maintaining APIs.",
-      "discovery_query": "typescript codemod",
-      "exact_revision": "c840bbf55bd34dc2901988a95cded63b4353167c",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-04T12:28:53Z",
-      "repository": "ivanDev237/upstreamfix",
-      "retained_unreviewed": true,
-      "root_code_signals": [
-        ".github",
-        "package.json",
-        "src",
-        "test"
-      ],
-      "size_kb": 1120,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "codemod",
-        "developer-tools",
-        "firebase-admin",
-        "migration",
-        "nodejs",
-        "sdk",
-        "stripe",
-        "typescript"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 10,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 49,
-      "url": "https://github.com/ivanDev237/upstreamfix"
-    },
-    {
-      "archived": false,
-      "default_branch": "main",
-      "description": "Upgrade agent for TypeScript apps: when an API changes, Shim opens one tested pull request. First up: Vercel AI SDK 6 to 7",
-      "discovery_query": "typescript codemod",
-      "exact_revision": "d524fe0eb0ddb01fc875b366f80950b4200c4f0b",
-      "forks": 0,
-      "primary_language": "TypeScript",
-      "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-07T04:14:51Z",
-      "repository": "JayanthMalladi/shim",
-      "root_code_signals": [
-        ".github",
-        "package.json",
-        "src",
-        "test"
-      ],
-      "size_kb": 9564,
-      "stars": 1,
-      "status": "PRE_VERIFICATION_CANDIDATE",
-      "topics": [
-        "ai",
-        "ai-agents",
-        "ai-sdk",
-        "automation",
-        "breaking-changes",
-        "cli",
-        "codemod",
-        "depenedency-management",
-        "developer-tools",
-        "devtools",
-        "llm",
-        "migration",
-        "nodejs",
-        "pull-requests",
-        "refactoring",
-        "static-analysis",
-        "ts-morph",
-        "typescript",
-        "upgrade",
-        "vercel-ai-sdk"
-      ],
-      "triage_components": {
-        "activity": 15,
-        "description": 4,
-        "forks": 0,
-        "license_metadata": 5,
-        "not_archived": 5,
-        "root_code_signals": 10,
-        "stars": 1,
-        "substantive_size": 4,
-        "topics": 5
-      },
-      "triage_score": 49,
-      "url": "https://github.com/JayanthMalladi/shim"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Require exact source revision, license verification, measured baseline-versus-after engineer time, passing target-specific checks and working integration before recording time saved.",
-  "generated_at": "2026-11-07T04:55:01.651525+00:00",
+  "generated_at": "2026-11-24T23:37:29.372861+00:00",
   "mission": "Engineering time reduction: find technically inspectable GitHub code, codemods, test selection, reproducible builds and debugging automation applicable across active projects; target substantial measured reductions in engineering hours, not novelty scores.",
   "project": "engineering-acceleration",
   "risk_review": [],
