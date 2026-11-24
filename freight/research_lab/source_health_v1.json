@@ -11,8 +11,8 @@
       "official_publisher_host_only": 2,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 202,
-      "third_party_catalog_host_only": 200,
+      "source_pointers": 209,
+      "third_party_catalog_host_only": 207,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -22,8 +22,8 @@
       "official_publisher_host_only": 33,
       "other_allowlisted_host_only": 6,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 270,
-      "third_party_catalog_host_only": 231,
+      "source_pointers": 271,
+      "third_party_catalog_host_only": 232,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -44,13 +44,13 @@
       "official_publisher_host_only": 1,
       "other_allowlisted_host_only": 0,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 181,
-      "third_party_catalog_host_only": 180,
+      "source_pointers": 187,
+      "third_party_catalog_host_only": 186,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 7,
+  "first_seen_in_last_seven_calendar_days": 21,
   "independent_payment_verification_cases": 0,
   "latest_first_seen": "2026-11-24",
   "limitations": [
@@ -63,7 +63,7 @@
   "publisher_host_counts": {
     "api.usaspending.gov": 1,
     "data.cityofnewyork.us": 36,
-    "github.com": 265,
+    "github.com": 276,
     "media.cadc.uscourts.gov": 1,
     "sam.gov": 1,
     "www.cbca.gov": 4,
@@ -75,13 +75,13 @@
     "www.sec.gov": 2,
     "www.stb.gov": 1,
     "www2.fmc.gov": 8,
-    "zenodo.org": 516
+    "zenodo.org": 519
   },
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "fd6ea3593b822fc8fe3f1e3c38b13bf11d66cd206061c24daf49b09701cfa2ce",
-  "unique_source_pointers": 859,
+  "source_ledger_entries_sha256": "8124cb99bed8d59c72b30a507634aa3fb2f12bad723b025625db786622deff3c",
+  "unique_source_pointers": 873,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }
