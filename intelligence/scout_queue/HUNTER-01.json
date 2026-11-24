@@ -1,11 +1,11 @@
 {
   "api_metrics": {
-    "api_requests": 66,
+    "api_requests": 68,
     "known_revision_skips": 0,
     "rate_limit_sleeps": 0,
     "retries": 0,
-    "revision_cache_hits": 1,
-    "root_cache_hits": 1
+    "revision_cache_hits": 0,
+    "root_cache_hits": 0
   },
   "authority": "PRE_VERIFICATION_DISCOVERY_ONLY",
   "candidate_count": 16,
@@ -15,13 +15,12 @@
       "default_branch": "main",
       "description": "Walk-forward volatility forecasting (GARCH, HAR, LightGBM) and VaR / Expected Shortfall backtesting for Nifty 50 stocks, with an API, dashboard and a grounded Q&A assistant",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "ec57c0dd337457dba35ffe3599f8d4439a49f581",
+      "exact_revision": "47b8caeeb9248d5ab28486fa1adf3433f44dc574",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-06T19:43:25Z",
+      "pushed_at": "2026-11-24T00:22:36Z",
       "repository": "tarubee19/vol-var-india",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "app",
@@ -32,7 +31,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 7433,
+      "size_kb": 9752,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -70,6 +69,7 @@
       "published_license_spdx": "NOASSERTION",
       "pushed_at": "2026-11-07T06:41:41Z",
       "repository": "pulseai-labs/pulse-trader",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "cargo.toml",
@@ -118,6 +118,7 @@
       "published_license_spdx": "MIT",
       "pushed_at": "2026-11-06T06:27:19Z",
       "repository": "0xArchiveIO/sdk-typescript",
+      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "package.json",
@@ -201,11 +202,11 @@
       "default_branch": "main",
       "description": "Tradier market data, accounts and trading for Open Meridian, a data, custody and connectivity plugin",
       "discovery_query": "tradier",
-      "exact_revision": "5601c2439c635d3f15aaf924e26ecfe477198b0d",
+      "exact_revision": "583cc5da5b50f9c07111c1c33412b3b03019ca9d",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-03T04:12:25Z",
+      "pushed_at": "2026-11-20T11:37:26Z",
       "repository": "open-meridian/plugin-tradier",
       "root_code_signals": [
         ".github",
@@ -215,7 +216,7 @@
         "src",
         "tests"
       ],
-      "size_kb": 429,
+      "size_kb": 554,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -402,11 +403,11 @@
       "default_branch": "main",
       "description": "AI-assisted trading workspace for Alpaca, Tradier, and Robinhood with human-in-the-loop proposal review and risk tracking.",
       "discovery_query": "tradier",
-      "exact_revision": "d8ad3c7de741b5384a837c42b683b1c561183212",
+      "exact_revision": "aeaa4c21cc3937fce448d849ba4ea8177414d40c",
       "forks": 0,
       "primary_language": "TypeScript",
       "published_license_spdx": "Apache-2.0",
-      "pushed_at": "2026-11-07T06:36:04Z",
+      "pushed_at": "2026-11-24T01:15:41Z",
       "repository": "Simple-With-Us/Socratic-Trade",
       "root_code_signals": [
         ".github",
@@ -416,7 +417,7 @@
         "src",
         "test"
       ],
-      "size_kb": 77006,
+      "size_kb": 86085,
       "stars": 2,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [],
@@ -665,19 +666,18 @@
       "default_branch": "main",
       "description": "Forecasting hourly MISO grid demand and benchmarking it against the grid operator's own day ahead forecast. EIA API, Open-Meteo, walk forward backtest.",
       "discovery_query": "walk forward backtesting",
-      "exact_revision": "d50197c95dc61022eef74077f1c3c749531b43c4",
+      "exact_revision": "52f3d5688cd44b9cc89801bf26e42e83570990e9",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-11-05T19:11:13Z",
+      "pushed_at": "2026-11-23T22:59:04Z",
       "repository": "austi20/miso-demand-forecaster",
-      "retained_unreviewed": true,
       "root_code_signals": [
         ".github",
         "src",
         "tests"
       ],
-      "size_kb": 354,
+      "size_kb": 473,
       "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
@@ -707,33 +707,37 @@
     },
     {
       "archived": false,
-      "default_branch": "master",
-      "description": "Open-source Python toolkit for quantitative research on Borsa Istanbul (BIST): data, features, walk-forward backtesting, risk/portfolio, backtest robustness (CPCV/PBO), diagnostics, reports, paper-trading bridge.",
-      "discovery_query": "walk forward trading backtest python open source",
-      "exact_revision": "27a690bb1073c43bf1145eae82c1545567a00482",
+      "default_branch": "main",
+      "description": "Self-hosted TradingView webhook trading bot in Python (FastAPI). Turns TradingView alerts into stock and ETF orders at Alpaca, Tradier, tastytrade or Charles Schwab. Dry run by default; paper or sandbox at Alpaca, Tradier and tastytrade; live orders need a per-broker flag. MIT licensed. Maintained by Nyria.",
+      "discovery_query": "tradier",
+      "exact_revision": "18c968dbb04ee6a094e869b419a30317a212c3e7",
       "forks": 0,
       "primary_language": "Python",
       "published_license_spdx": "MIT",
-      "pushed_at": "2026-10-10T13:45:42Z",
-      "repository": "HaasEnjoyer/quanttro",
-      "retained_unreviewed": true,
+      "pushed_at": "2026-11-21T01:21:59Z",
+      "repository": "Nyria-LLC/tradingview-webhook-trading-bot",
       "root_code_signals": [
         "pyproject.toml",
+        "src",
         "tests"
       ],
-      "size_kb": 260,
-      "stars": 2,
+      "size_kb": 99,
+      "stars": 0,
       "status": "PRE_VERIFICATION_CANDIDATE",
       "topics": [
         "algorithmic-trading",
-        "backtesting",
-        "bist",
-        "overfitting",
-        "portfolio-optimization",
-        "prop-firm",
+        "alpaca",
+        "fastapi",
+        "paper-trading",
         "python",
-        "quantitative-finance",
-        "risk-management"
+        "schwab",
+        "tastytrade",
+        "tradier",
+        "trading-bot",
+        "tradingview",
+        "tradingview-alerts",
+        "tradingview-webhook",
+        "webhook"
       ],
       "triage_components": {
         "activity": 15,
@@ -741,18 +745,18 @@
         "forks": 0,
         "license_metadata": 5,
         "not_archived": 5,
-        "root_code_signals": 6,
-        "stars": 2,
+        "root_code_signals": 9,
+        "stars": 0,
         "substantive_size": 4,
         "topics": 5
       },
-      "triage_score": 46,
-      "url": "https://github.com/HaasEnjoyer/quanttro"
+      "triage_score": 47,
+      "url": "https://github.com/Nyria-LLC/tradingview-webhook-trading-bot"
     }
   ],
   "catalogs": [],
   "evidence_gate": "Verify fresh market-data provenance, realistic transaction costs, out-of-sample results and independent reproducibility; no orders or unverified alpha claims.",
-  "generated_at": "2026-11-07T08:21:22.655317+00:00",
+  "generated_at": "2026-11-24T01:37:21.360961+00:00",
   "mission": "Trading research: find independently testable data-ingestion, walk-forward backtesting and market microstructure tools; identify reproducible research edges after costs and out-of-sample checks, never execute trades or claim profits from simulations.",
   "project": "trading",
   "risk_review": [],
