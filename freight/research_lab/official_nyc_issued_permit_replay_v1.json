@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-24",
+  "as_of_utc_date": "2026-11-25",
   "buyer_opportunity_ground_truth": false,
   "external_customer_contacts": 0,
   "independent_issuance_outcome_labels": 0,
@@ -17,11 +17,11 @@
   "readback_ambiguous": 0,
   "readback_changed": 0,
   "readback_checked": 3,
-  "readback_exact_match": 3,
+  "readback_exact_match": 1,
   "readback_missing": 0,
-  "readback_unavailable": 0,
-  "receipt_sha256": "e1954f1b8e8ec62715b1e552a1466078c6ee1af741e27d55d0692e07afacd32e",
-  "sample_canonical_sha256": "45df3c5475f13a2618ff626dd2362a5b1067ab738c189648edbcbceac86b7150",
+  "readback_unavailable": 2,
+  "receipt_sha256": "67278e140d03574a48833fce3540465e65cbdba21721e4a3ca5a8c2ac8db21fe",
+  "sample_canonical_sha256": "c71f23660fe11e80a7930bb5dd0dba001af86e849de95941d01fae166689d79c",
   "sample_count": 20,
   "sample_original_rows_stored": 0,
   "sample_repeated_source_rows": 4,
@@ -29,7 +29,8 @@
   "schema_version": 1,
   "scope": "ORIGINAL_NYC_PERMIT_SOURCE_READBACK_NOT_INDEPENDENT_OUTCOME",
   "source_errors": [
-    "DUPLICATE_SOURCE_IDENTITIES"
+    "DUPLICATE_SOURCE_IDENTITIES",
+    "PUBLISHER_ROW_READBACK_INCOMPLETE"
   ],
   "source_specific_commercial_license_verified": false,
   "status": "PUBLISHER_REPLAY_DEGRADED",
