@@ -179,6 +179,31 @@
       "case_id": null,
       "commercial_reuse_authorized": false,
       "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
+      "first_seen": "2026-11-26",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "lead_id": "fd4314c96e550c47ba1cdc65ad3270a8d08a77114ae0efb5b7c7ee77865f4763",
+      "model": {
+        "evidence_status": "REVIEW_REQUIRED",
+        "rating_status": "REVIEW_REQUIRED",
+        "synthetic_shipment_only": true,
+        "verified_cash_recovered_cents": 0,
+        "verified_freight_error_cents": null
+      },
+      "origins": [
+        "UNIFIED"
+      ],
+      "publisher_host": "zenodo.org",
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "source_document_ingested": false,
+      "source_kind": "UNCLASSIFIED_PUBLIC_DATASET_LEAD",
+      "source_url": "https://zenodo.org/records/23933127",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH"
+    },
+    {
+      "case_id": null,
+      "commercial_reuse_authorized": false,
+      "evaluation_state": "SOURCE_POINTER_WITH_SYNTHETIC_PROOF_GATE_ONLY",
       "first_seen": "2026-11-24",
       "independent_ground_truth": false,
       "independent_payment_verified": false,
@@ -6959,7 +6984,7 @@
   ],
   "commercial_recovery_allowed": false,
   "customer_contacts_sent": 0,
-  "feed_sha256": "8b891fcc69c5d59e59c552f499b21fd8c304b2b6500b4f116fe56c0ef3fca0e9",
+  "feed_sha256": "59ac3abac4d3c2d7877bc7088c8155caf75224e23783fb59fba97d3653af3d4b",
   "feed_version": "1.1.0",
   "frozen_pack_fixture_sha256_not_original_docs": "6b64c433a0ff717fd0c1d80a0d64b377bc27c96c00d184e08716aa91470c23fa",
   "frozen_v1_historical_cases": 9,
@@ -6971,12 +6996,12 @@
   "pack_version": "1.0.0",
   "production_changes": 0,
   "schema_version": 1,
-  "selected_for_synthetic_proof_gate": 278,
-  "source_pointers_total": 278,
+  "selected_for_synthetic_proof_gate": 279,
+  "source_pointers_total": 279,
   "source_receipts": {
     "lab15_candidate_metadata_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
     "lab15_evidence_metadata_sha256": "6ce379ed15d3b0aa79250620c0ecd417a9afd01ed87b9569441cb911b6ce78e2",
-    "unified_entries_sha256": "8124cb99bed8d59c72b30a507634aa3fb2f12bad723b025625db786622deff3c"
+    "unified_entries_sha256": "a3290be9527b8b59e590cb1c4ca18ba045f5f202b76bf02b605586d71ad8988e"
   },
   "unsafe_or_unrepresentable_legacy_pointers_skipped": 11,
   "verified_recovered_cash_cents": 0
