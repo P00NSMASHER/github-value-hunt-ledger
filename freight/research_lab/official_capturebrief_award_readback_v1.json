@@ -1,5 +1,5 @@
 {
-  "as_of_utc_date": "2026-11-25",
+  "as_of_utc_date": "2026-11-26",
   "buyer_opportunity_truth": false,
   "contract_award_window": [
     "2025-10-01",
@@ -35,7 +35,7 @@
   "publisher_readbacks_unavailable": 2,
   "publisher_source_anchor_id": "c95ab3d08065c413405b611483719c147a03d675d8d736ed2321a924f368421e",
   "realized_recovery_cents": 0,
-  "receipt_sha256": "7ff722ca1e4a1c4acb651dcc2069a9c7748233497f53f6fdce6f00cac8efbb5c",
+  "receipt_sha256": "ca9e57759189ddcd0782ab6dc8aaf67d3d044011f9bf2d9e583640af7f448291",
   "recipient_identifiers_stored": 0,
   "repeated_source_rows": 0,
   "sample_net_awarded_amount_minor": 46964242918523,
