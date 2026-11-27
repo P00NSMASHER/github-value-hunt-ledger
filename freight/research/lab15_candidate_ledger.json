@@ -1,5 +1,5 @@
 {
-  "digest_sha256": "dd8943d1d2278dee9522a7d8bd50991a053cfe4f70da45a251fb2d0e9551ed2b",
+  "digest_sha256": "03174f757952c6823305df45fd824133c919cef396780c815de55e39f9406cd6",
   "lab": 15,
   "leads": [
     {
@@ -13,6 +13,30 @@
       "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
       "title": "datacite freight research candidate",
       "url": "https://doi.org/10.48550/arxiv.2203.02799"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-11-27",
+      "id": "1ed594088a7eecdd63253f1d6eadf57e28a66a747f8352cd19687419c729ff63",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.5281/zenodo.24447432"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-11-27",
+      "id": "391537862e574bd6d1853a580a88cfe863d51e9f42658389da016a178bdcc3c8",
+      "invoice_bytes_archived": false,
+      "provider": "dataverse",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "dataverse freight research candidate",
+      "url": "https://doi.org/10.7910/DVN/WBLQ41"
     },
     {
       "actual_cash_recovery_verified": false,
@@ -53,6 +77,18 @@
     {
       "actual_cash_recovery_verified": false,
       "customer_use_authorized": false,
+      "first_seen": "2026-11-27",
+      "id": "7c2cd526756bd36bff26cb7339c0d5b3cfab8ddd0978dc7d2b8523c6730a67a6",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.7910/dvn/wblq41"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
       "first_seen": "2026-10-24",
       "id": "7d18c8724235189708b79c8f821bcda6bbd54f6a55392f54d26553c33e1ab2b3",
       "invoice_bytes_archived": false,
@@ -85,6 +121,18 @@
       "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
       "title": "GAO public LTL rate dispute decision B-148465",
       "url": "https://www.gao.gov/products/b-148465"
+    },
+    {
+      "actual_cash_recovery_verified": false,
+      "customer_use_authorized": false,
+      "first_seen": "2026-11-27",
+      "id": "ae1d5025cfa0feb10d77d97ccfdc64acde5de88b72c821f2972dd1087b63ca52",
+      "invoice_bytes_archived": false,
+      "provider": "datacite",
+      "rated_ground_truth_verified": false,
+      "status": "CANDIDATE_ONLY_RIGHTS_AND_TRUTH_UNVERIFIED",
+      "title": "datacite freight research candidate",
+      "url": "https://doi.org/10.5281/zenodo.24447433"
     },
     {
       "actual_cash_recovery_verified": false,
