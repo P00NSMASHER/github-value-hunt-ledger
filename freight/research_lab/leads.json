@@ -12123,6 +12123,22 @@
       "commercial_reuse_authorized": false,
       "document_bytes_stored": false,
       "engines": [
+        "freightrecovery"
+      ],
+      "first_seen": "2026-11-27",
+      "id": "df90721a4a664afb10f4f666054e3b15a2461bf1857381ffb4b34c6981d098c1",
+      "independent_ground_truth": false,
+      "independent_payment_verified": false,
+      "publisher": "github.com",
+      "recovered_cash_verified": false,
+      "rights_state": "UNVERIFIED_EXTERNAL_SOURCE_RIGHTS_HOLD",
+      "truth_state": "UNVERIFIED_NOT_INDEPENDENT_GROUND_TRUTH",
+      "url": "https://github.com/sharmaaman8588-hue/rerate"
+    },
+    {
+      "commercial_reuse_authorized": false,
+      "document_bytes_stored": false,
+      "engines": [
         "capturebrief"
       ],
       "first_seen": "2026-10-23",
@@ -13993,6 +14009,6 @@
       "url": "https://zenodo.org/records/21977764"
     }
   ],
-  "entries_sha256": "a3290be9527b8b59e590cb1c4ca18ba045f5f202b76bf02b605586d71ad8988e",
+  "entries_sha256": "6b42a940d29829bb01a0117f0b499adafddac505452607c9e6ce72f1be3c6dce",
   "schema_version": 1
 }

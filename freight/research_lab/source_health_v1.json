@@ -22,8 +22,8 @@
       "official_publisher_host_only": 33,
       "other_allowlisted_host_only": 6,
       "readiness": "UNVERIFIED_SOURCE_METADATA_ONLY",
-      "source_pointers": 272,
-      "third_party_catalog_host_only": 233,
+      "source_pointers": 273,
+      "third_party_catalog_host_only": 234,
       "usable_as_engine_ground_truth": false,
       "wrong_topic_url_heuristic_review_only": 0
     },
@@ -50,9 +50,9 @@
       "wrong_topic_url_heuristic_review_only": 0
     }
   },
-  "first_seen_in_last_seven_calendar_days": 19,
+  "first_seen_in_last_seven_calendar_days": 20,
   "independent_payment_verification_cases": 0,
-  "latest_first_seen": "2026-11-26",
+  "latest_first_seen": "2026-11-27",
   "limitations": [
     "Publisher host identity does not establish source authenticity, rights, relevance or ground truth.",
     "URL-only topic flags are screening heuristics, not verified classifications.",
@@ -63,7 +63,7 @@
   "publisher_host_counts": {
     "api.usaspending.gov": 1,
     "data.cityofnewyork.us": 36,
-    "github.com": 276,
+    "github.com": 277,
     "media.cadc.uscourts.gov": 1,
     "sam.gov": 1,
     "www.cbca.gov": 4,
@@ -80,8 +80,8 @@
   "receipt_type": "UNVERIFIED_SOURCE_CANDIDATE_QUALITY_COUNTS",
   "schema_version": 1,
   "source_document_bytes_stored": 0,
-  "source_ledger_entries_sha256": "a3290be9527b8b59e590cb1c4ca18ba045f5f202b76bf02b605586d71ad8988e",
-  "unique_source_pointers": 874,
+  "source_ledger_entries_sha256": "6b42a940d29829bb01a0117f0b499adafddac505452607c9e6ce72f1be3c6dce",
+  "unique_source_pointers": 875,
   "verified_original_document_benchmark_truth_cases": 0,
   "verified_recovered_cash_cents": 0
 }
