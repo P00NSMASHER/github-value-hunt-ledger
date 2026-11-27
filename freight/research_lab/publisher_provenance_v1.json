@@ -1,6 +1,6 @@
 {
   "anchor_set_sha256": "0d7a1f4c0a2ea605e74eddda92e4936ffad3fad2d3dc7e8d5cd31649314fde72",
-  "as_of_utc_date": "2026-11-26",
+  "as_of_utc_date": "2026-11-27",
   "commercial_reuse_approved": false,
   "customer_contact_actions": 0,
   "full_public_responses_fingerprinted": 2,
@@ -187,7 +187,7 @@
   },
   "production_changes": 0,
   "publisher_http_responses_observed": 3,
-  "receipt_sha256": "9930ea2163c1aa040b22cb350596c065b8c02bbbef71f2cf294f66ccb18d81be",
+  "receipt_sha256": "52a74ec67bdb4bb5099f923eec23f828166ffcf5d441c3b4f7bf58d0afa30776",
   "schema_version": 1,
   "scope": "PUBLIC_PUBLISHER_RESPONSE_OBSERVATIONS_NOT_BENCHMARK_TRUTH",
   "source_document_bytes_stored": 0,
