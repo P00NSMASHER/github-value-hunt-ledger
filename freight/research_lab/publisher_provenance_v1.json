@@ -1,6 +1,6 @@
 {
   "anchor_set_sha256": "0d7a1f4c0a2ea605e74eddda92e4936ffad3fad2d3dc7e8d5cd31649314fde72",
-  "as_of_utc_date": "2026-11-27",
+  "as_of_utc_date": "2026-11-28",
   "commercial_reuse_approved": false,
   "customer_contact_actions": 0,
   "full_public_responses_fingerprinted": 2,
@@ -75,9 +75,9 @@
     },
     {
       "benchmark_ready": false,
-      "bytes_hashed": 108142,
+      "bytes_hashed": 107881,
       "commercial_reuse_approved": false,
-      "content_sha256": "76f047dab8725650e3fcde68208848dd75fe2e99c6eb996c5c016480b3bc2e5a",
+      "content_sha256": "3a9baf8adfa9a9025a0cb6876e028d1a8c86635a8953987a686b86d90dada8de",
       "engine": "freightrecovery",
       "first_seen": "2026-10-23",
       "head_http_status": 200,
@@ -187,7 +187,7 @@
   },
   "production_changes": 0,
   "publisher_http_responses_observed": 3,
-  "receipt_sha256": "52a74ec67bdb4bb5099f923eec23f828166ffcf5d441c3b4f7bf58d0afa30776",
+  "receipt_sha256": "861824e39e2db53f9051842844925df20b5651ac67713b0eb8cef44342ca2ce7",
   "schema_version": 1,
   "scope": "PUBLIC_PUBLISHER_RESPONSE_OBSERVATIONS_NOT_BENCHMARK_TRUTH",
   "source_document_bytes_stored": 0,
